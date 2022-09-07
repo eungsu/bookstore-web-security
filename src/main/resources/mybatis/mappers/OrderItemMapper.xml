@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.store.mapper.OrderItemMapper">
+	
+	<resultMap id="OrderItemResultMap" type="OrderItem">
+		<id column="order_item_id" property="id"/>
+		<result column="order_item_price" property="price"/>
+		<result column="order_item_quantity" property="quantity"/>
+		<result column="order_item_created_date" property="createdDate"/>
+		<result column="order_item_updated_date" property="updatedDate"/>
+		<association property="book" column="book_id" select="com.example.store.mapper.BookMapper.getBookById" />
+	</resultMap>
+	
+	<insert id="insertOrderItem" parameterType="OrderItem">
+		insert into order_items (order_item_id, order_item_price, order_item_quantity, book_id, order_id)
+		values (order_items_seq.nextval, #{price}, #{quantity}, #{book.id}, #{order.id})
+	</insert>
+	
+	<!-- List<OrderItem> getOrderItemsByOrderId(int orderId); -->
+	<select id="getOrderItemsByOrderId" parameterType="int" resultMap="OrderItemResultMap">
+		select *
+		from order_items
+		where order_id = #{value}
+		order by order_item_id asc
+	</select>
+	
+</mapper>

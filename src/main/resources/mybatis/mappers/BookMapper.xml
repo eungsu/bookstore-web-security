@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.store.mapper.BookMapper">
+
+	<resultMap id="BookResultMap" type="Book">
+		<id column="book_id" property="id"/>
+		<result column="book_title" property="title"/>
+		<result column="book_author" property="author"/>
+		<result column="book_publisher" property="publisher"/>
+		<result column="book_description" property="description"/>
+		<result column="book_price" property="price"/>
+		<result column="book_discount_price" property="discountPrice"/>
+		<result column="book_stock" property="stock"/>
+		<result column="book_on_sell" property="onSell"/>
+		<result column="book_review_count" property="reviewCount"/>
+		<result column="book_review_score" property="reviewScore"/>
+		<result column="book_created_date" property="createdDate"/>
+		<result column="book_updated_date" property="updatedDate"/>
+	</resultMap>
+	
+	<select id="getTotalRows" resultType="int">
+		select count(*)
+		from books
+		<where>
+	        <choose>
+	      	    <when test="option == 'title'">
+	      	        book_title like '%' || #{keyword} || '%'	
+	      	    </when>
+	      	    <when test="option == 'author'">
+	      	        book_author like '%' || #{keyword} || '%'	
+	      	    </when>
+	      	    <when test="option == 'publisher'">
+	      	        book_publisher like '%' || #{keyword} || '%'	
+	      	    </when>
+	        </choose>
+	    </where>
+	</select>
+	
+	<select id="getBooks" resultMap="BookResultMap">
+		select *
+		from (select A.*
+			  <choose>
+			      <when test="pagable.sort == 'date'">, row_number() over(order by A.book_id asc) rn</when>
+			      <when test="pagable.sort == 'title'">, row_number() over(order by A.book_title asc) rn</when>
+			      <when test="pagable.sort == 'low'">, row_number() over(order by A.book_price asc) rn</when>
+			      <when test="pagable.sort == 'high'">, row_number() over(order by A.book_price desc) rn</when>
+			  </choose>
+		      from books A
+		      <where>
+		      	  <choose>
+		      	      <when test="criteria.option == 'title'">
+		      	          book_title like '%' || #{criteria.keyword} || '%'	
+		      	      </when>
+		      	      <when test="criteria.option == 'author'">
+		      	          book_author like '%' || #{criteria.keyword} || '%'	
+		      	      </when>
+		      	      <when test="criteria.option == 'publisher'">
+		      	          book_publisher like '%' || #{criteria.keyword} || '%'	
+		      	      </when>
+		      	  </choose>
+		      </where>)
+		where rn between #{pagable.beginIndex} and #{pagable.endIndex}
+	</select>
+	
+	<select id="getBookById" parameterType="int" resultMap="BookResultMap">
+		select *
+		from books
+		where book_id = #{value}
+	</select>
+	
+	<update id="updateBook" parameterType="Book">
+		update books
+		set
+			book_title = #{title},
+			book_author = #{author},
+			book_publisher = #{publisher},
+			book_description = #{description},
+			book_price = #{price},
+			book_discount_price = #{discountPrice},
+			book_stock = #{stock},
+			book_on_sell = #{onSell},
+			book_review_count = #{reviewCount},
+			book_review_score = #{reviewScore},
+			book_updated_date = sysdate
+		where book_id = #{id}
+	</update>
+</mapper>

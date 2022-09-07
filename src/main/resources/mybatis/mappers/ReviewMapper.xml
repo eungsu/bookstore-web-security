@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.store.mapper.ReviewMapper">
+
+	<resultMap id="ReviewResultMap" type="Review">
+		<id column="review_id" property="id"/>
+		<result column="review_content" property="content"/>
+		<result column="review_score" property="score"/>
+		<result column="review_created_date" property="createdDate"/>
+		<result column="review_updated_date" property="updatedDate"/>
+		<association property="user" column="user_id" select="com.example.store.mapper.UserMapper.getUserById" />
+	</resultMap>
+	
+	<insert id="insertReview" parameterType="Review">
+		insert into reviews (review_id, review_content, review_score, user_id, book_id)
+		values (reviews_seq.nextval, #{content}, #{score}, #{user.id}, #{book.id})
+	</insert>
+	
+	<select id="getReviewTotalRows" parameterType="int" resultType="int">
+		select count(*)
+		from reviews
+		where book_id = #{value}
+	</select>
+	
+	<select id="getReviewsByBookId" resultMap="ReviewResultMap">
+		select *
+		from (select A.*, row_number() over(order by A.review_id desc) rn
+			  from reviews A
+			  where book_id = #{bookId})
+		where rn between #{pagable.beginIndex} and #{pagable.endIndex}
+	</select>
+	
+	<select id="getReviewById" parameterType="int" resultMap="ReviewResultMap">
+		select *
+		from reviews
+		where review_id = #{value}
+	</select>
+	
+	<delete id="deleteReview" parameterType="int">
+		delete from reviews
+		where review_id = #{value}
+	</delete>
+</mapper>

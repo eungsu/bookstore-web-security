@@ -1,0 +1,31 @@
+server:
+  port: 80
+  
+logging:
+  level:
+    root: info
+    '[com.example.store.mapper]': trace
+    
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: jdbc:oracle:thin:@localhost:1521:xe
+    username: hta
+    password: zxcv1234
+  web:
+    resources:
+      static-locations:
+      - /resources/
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+    static-path-pattern: /resources/**
+
+mybatis:
+  mapper-locations:
+  - mybatis/mappers/*.xml
+  type-aliases-package: com.example.store.vo,com.example.store.dto,com.example.store.paging
+  configuration:
+    jdbc-type-for-null: null
+    log-impl: org.apache.ibatis.logging.log4j2.Log4j2Impl

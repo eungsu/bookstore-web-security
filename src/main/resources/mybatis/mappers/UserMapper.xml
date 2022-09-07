@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.store.mapper.UserMapper">
+	
+	<resultMap id="UserResultMap" type="User">
+		<id column="user_id" property="id"/>
+		<result column="user_email" property="email"/>
+		<result column="user_secret_password" property="password"/>
+		<result column="user_name" property="name"/>
+		<result column="user_tel" property="tel"/>
+		<result column="user_point" property="point"/>
+		<result column="user_disabled" property="disabled"/>
+		<result column="user_created_date" property="createdDate"/>
+		<result column="user_updated_date" property="updatedDate"/>
+		<result column="user_role" property="role" />
+	</resultMap>
+	
+	<!--
+	User getUserByEmail(String email);
+	User getUserById(int id);
+	void insertUser(User user);  -->
+	
+	<select id="getUserByEmail" parameterType="string" resultMap="UserResultMap">
+		select *
+		from users
+		where user_email = #{value}
+	</select>
+	
+	<select id="getUserById" parameterType="int" resultMap="UserResultMap">
+		select *
+		from users
+		where user_id = #{value}
+	</select>
+	
+	<insert id="insertUser" parameterType="User">
+		<selectKey keyProperty="id" resultType="int" order="BEFORE">
+			select users_seq.nextval
+			from dual
+		</selectKey>
+		insert into users (user_id, user_email, user_secret_password, user_name, user_tel)
+		values (#{id}, #{email}, #{password}, #{name}, #{tel})
+	</insert>
+	
+	<update id="updateUser" parameterType="User">
+		update users
+		set
+			user_secret_password = #{password},
+			user_tel = #{tel},
+			user_point = #{point},
+			user_disabled = #{disabled},
+			user_updated_date = sysdate
+		where user_id = #{id}
+	</update>
+</mapper>

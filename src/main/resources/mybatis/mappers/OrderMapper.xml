@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.store.mapper.OrderMapper">
+
+	<resultMap id="OrderResultMap" type="Order">
+		<id column="order_id" property="id"/>
+		<result column="order_status" property="status"/>
+		<result column="order_title" property="title"/>
+		<result column="order_total_price" property="totalPrice"/>
+		<result column="order_used_point" property="usedPoint"/>
+		<result column="order_payment_price" property="paymentPrice"/>
+		<result column="order_deposit_point" property="depositPoint"/>
+		<result column="order_total_quantity" property="totalQuantity"/>
+		<result column="order_created_date" property="createdDate"/>
+		<result column="order_updated_date" property="updatedDate"/>
+		<association property="user" column="user_id" select="com.example.store.mapper.UserMapper.getUserById" />
+	</resultMap>
+
+	<insert id="insertOrder" parameterType="Order">
+		<selectKey keyProperty="id" resultType="int" order="BEFORE">
+			select orders_seq.nextval
+			from dual
+		</selectKey>
+		insert into orders (order_id, order_title, order_total_price, order_used_point, order_payment_price, order_deposit_point, order_total_quantity, user_id)
+		values (#{id}, #{title}, #{totalPrice}, #{usedPoint}, #{paymentPrice}, #{depositPoint}, #{totalQuantity}, #{user.id})
+	</insert>
+	
+	<select id="getOrderById" parameterType="int" resultMap="OrderResultMap">
+		select *
+		from orders
+		where order_id = #{value}
+	</select>
+	
+	<select id="getOrderTotalRows" parameterType="int" resultType="int">
+		select count(*)
+		from orders
+		where user_id = #{value}
+	</select>
+	
+	<!-- List<OrderDetailDto> getOrdersByUserId(@Param("pagable") Pagable pagable, @Param("userId") int userId); -->
+	<select id="getOrdersByUserId" resultMap="OrderResultMap">
+		select *
+		from (select A.*, row_number() over(order by A.order_id desc) rn
+		      from orders A
+		      where A.user_id = #{userId})
+		where rn between #{pagable.beginIndex} and #{pagable.endIndex}
+	</select>
+	
+</mapper>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.store.mapper.CartItemMapper">
+	
+	<resultMap id="CartItemResultMap" type="CartItem">
+		<id column="cart_item_id" property="id"/>
+		<result column="cart_item_quantity" property="quantity"/>
+		<result column="cart_item_created_date" property="createdDate"/>
+		<result column="cart_item_updated_date" property="updatedDate"/>
+		<association column="user_id" property="user" select="com.example.store.mapper.UserMapper.getUserById"/>
+		<association column="book_id" property="book" select="com.example.store.mapper.BookMapper.getBookById"/>
+	</resultMap>
+
+	<select id="getCartItemByUserIdAndBookId" resultMap="CartItemResultMap">
+		select *
+		from cart_items
+		where user_id = #{userId} and book_id = #{bookId}
+	</select>
+	
+	<select id="getCartItemById" parameterType="int" resultMap="CartItemResultMap">
+		select *
+		from cart_items
+		where cart_item_id = #{value}
+	</select>
+	
+	<select id="getCartItemTotalRows" parameterType="int" resultType="int">
+		select count(*)
+		from cart_items
+		where user_id = #{value}
+	</select>
+	
+	<select id="getCartItemsByUserId" resultMap="CartItemResultMap">
+		select *
+		from (select A.*, row_number() over(order by A.cart_item_id desc) rn
+		      from cart_items A
+		      where A.user_id = #{userId})
+		where rn between #{pagable.beginIndex} and #{pagable.endIndex}
+	</select>
+	
+	<select id="getCartItemsByIds" resultMap="CartItemResultMap">
+		select *
+		from cart_items
+		where cart_item_id in
+		<foreach collection="cartItemIds" item="cartItemId" open="(" close=")" separator=",">
+			#{cartItemId}
+		</foreach>
+	</select>
+	
+	<insert id="insertCartItem" parameterType="CartItem">
+		insert into cart_items (cart_item_id, cart_item_quantity, user_id, book_id)
+		values (cart_items_seq.nextval, #{quantity}, #{user.id}, #{book.id})
+	</insert>
+	
+	<update id="updateCartItem" parameterType="CartItem">
+		update cart_items
+		set
+			cart_item_quantity = #{quantity},
+			cart_item_updated_date = sysdate
+		where cart_item_id = #{id}
+	</update>
+	
+	<delete id="deleteCartItemsByIds">
+		delete from cart_items
+		where user_id = #{userId}
+		and cart_item_id in
+		<foreach collection="cartItemIds" item="cartItemId" open="(" close=")" separator=",">
+			#{cartItemId}
+		</foreach>
+	</delete>
+	
+</mapper>
