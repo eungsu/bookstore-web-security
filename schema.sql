@@ -8,7 +8,7 @@ CREATE SEQUENCE  "USER_POINT_HISTORIES_SEQ" START WITH 1000000000 NOCACHE;
 
   CREATE TABLE "USERS" 
    (	"USER_ID" NUMBER(10,0) constraint users_id_pk primary key, 
-	"USER_EMAIL" VARCHAR2(255) constraint users_user_email_uk, 
+	"USER_EMAIL" VARCHAR2(255) constraint users_user_email_uk unique, 
 	"USER_PASSWORD" VARCHAR2(100), 
 	"USER_NAME" VARCHAR2(255) not null, 
 	"USER_TEL" VARCHAR2(50) not null, 
@@ -86,5 +86,5 @@ CREATE SEQUENCE  "USER_POINT_HISTORIES_SEQ" START WITH 1000000000 NOCACHE;
 	"POINT_CREATED_DATE" DATE DEFAULT SYSDATE, 
 	"POINT_UPDATED_DATE" DATE DEFAULT SYSDATE, 
 	"USER_ID" NUMBER(10,0) constraint pointhistories_user_id_fk references users (user_id),
-	"ORDER_ID" NUMBER(10,0) constraint pointhistories_user_id_fk references users (user_id)
+	"ORDER_ID" NUMBER(10,0) constraint pointhistories_order_id_fk references orders (order_id)
    ) ;
