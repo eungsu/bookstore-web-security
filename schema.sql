@@ -6,85 +6,84 @@ CREATE SEQUENCE  "REVIEWS_SEQ" START WITH 1000000000 NOCACHE;
 CREATE SEQUENCE  "USERS_SEQ" START WITH 1000000000 NOCACHE;
 CREATE SEQUENCE  "USER_POINT_HISTORIES_SEQ" START WITH 1000000000 NOCACHE;
 
-  CREATE TABLE "USERS" 
-   (	"USER_ID" NUMBER(10,0) constraint users_id_pk primary key, 
-	"USER_EMAIL" VARCHAR2(255) constraint users_user_email_uk unique, 
-	"USER_PASSWORD" VARCHAR2(100), 
-	"USER_NAME" VARCHAR2(255) not null, 
-	"USER_TEL" VARCHAR2(50) not null, 
-	"USER_POINT" NUMBER(10,0) DEFAULT 0, 
-	"USER_DISABLED" CHAR(1) DEFAULT 'N', 
-	"USER_CREATED_DATE" DATE DEFAULT SYSDATE, 
-	"USER_UPDATED_DATE" DATE DEFAULT SYSDATE, 
-	"USER_ROLE" VARCHAR2(20) DEFAULT 'ROLE_USER', 
-	"USER_SECRET_PASSWORD" VARCHAR2(100)
-   ) ;
+CREATE TABLE "USERS" (
+"USER_ID" NUMBER(10,0) constraint users_id_pk primary key, 
+"USER_EMAIL" VARCHAR2(255) constraint users_user_email_uk unique, 
+"USER_PASSWORD" VARCHAR2(100), 
+"USER_NAME" VARCHAR2(255) not null, 
+"USER_TEL" VARCHAR2(50) not null, 
+"USER_POINT" NUMBER(10,0) DEFAULT 0, 
+"USER_DISABLED" CHAR(1) DEFAULT 'N', 
+"USER_CREATED_DATE" DATE DEFAULT SYSDATE, 
+"USER_UPDATED_DATE" DATE DEFAULT SYSDATE, 
+"USER_ROLE" VARCHAR2(20) DEFAULT 'ROLE_USER'
+);
 
-  CREATE TABLE "BOOKS" 
-   (	"BOOK_ID" NUMBER(10,0) constraint books_id_pk primary key, 
-	"BOOK_TITLE" VARCHAR2(255) not null, 
-	"BOOK_AUTHOR" VARCHAR2(255) not null, 
-	"BOOK_PUBLISHER" VARCHAR2(255) not null, 
-	"BOOK_DESCRIPTION" CLOB not null, 
-	"BOOK_PRICE" NUMBER(10,0) not null, 
-	"BOOK_DISCOUNT_PRICE" NUMBER(10,0), 
-	"BOOK_STOCK" NUMBER(10,0), 
-	"BOOK_ON_SELL" CHAR(1) DEFAULT 'Y', 
-	"BOOK_REVIEW_COUNT" NUMBER(10,0) DEFAULT 0, 
-	"BOOK_REVIEW_SCORE" NUMBER(2,1) DEFAULT 0.0, 
-	"BOOK_CREATED_DATE" DATE DEFAULT SYSDATE, 
-	"BOOK_UPDATED_DATE" DATE DEFAULT SYSDATE
-   ) ;
+CREATE TABLE "BOOKS" (
+"BOOK_ID" NUMBER(10,0) constraint books_id_pk primary key, 
+"BOOK_TITLE" VARCHAR2(255) not null, 
+"BOOK_AUTHOR" VARCHAR2(255) not null, 
+"BOOK_PUBLISHER" VARCHAR2(255) not null, 
+"BOOK_DESCRIPTION" CLOB not null, 
+"BOOK_PRICE" NUMBER(10,0) not null, 
+"BOOK_DISCOUNT_PRICE" NUMBER(10,0), 
+"BOOK_STOCK" NUMBER(10,0), 
+"BOOK_ON_SELL" CHAR(1) DEFAULT 'Y', 
+"BOOK_REVIEW_COUNT" NUMBER(10,0) DEFAULT 0, 
+"BOOK_REVIEW_SCORE" NUMBER(2,1) DEFAULT 0.0, 
+"BOOK_CREATED_DATE" DATE DEFAULT SYSDATE, 
+"BOOK_UPDATED_DATE" DATE DEFAULT SYSDATE
+);
 
-  CREATE TABLE "CART_ITEMS" 
-   (	"CART_ITEM_ID" NUMBER(10,0) constraint cartitems_id_pk primary key, 
-	"CART_ITEM_QUANTITY" NUMBER(3,0) not null, 
-	"CART_ITEM_CREATED_DATE" DATE DEFAULT SYSDATE, 
-	"CART_ITEM_UPDATED_DATE" DATE DEFAULT SYSDATE, 
-	"USER_ID" NUMBER(10,0) constraint cartitems_user_id_fk references users (user_id), 
-	"BOOK_ID" NUMBER(10,0) constraint cartitems_book_id_fk references books (book_id)
-   ) ;
+CREATE TABLE "CART_ITEMS" (
+"CART_ITEM_ID" NUMBER(10,0) constraint cartitems_id_pk primary key, 
+"CART_ITEM_QUANTITY" NUMBER(3,0) not null, 
+"CART_ITEM_CREATED_DATE" DATE DEFAULT SYSDATE, 
+"CART_ITEM_UPDATED_DATE" DATE DEFAULT SYSDATE, 
+"USER_ID" NUMBER(10,0) constraint cartitems_user_id_fk references users (user_id), 
+"BOOK_ID" NUMBER(10,0) constraint cartitems_book_id_fk references books (book_id)
+);
 
-  CREATE TABLE "ORDERS" 
-   (	"ORDER_ID" NUMBER(10,0) constraint orders_id_pk primary key, 
-	"ORDER_STATUS" VARCHAR2(100) DEFAULT '주문완료', 
-	"ORDER_TITLE" VARCHAR2(255) not null, 
-	"ORDER_TOTAL_PRICE" NUMBER(10,0), 
-	"ORDER_USED_POINT" NUMBER(10,0), 
-	"ORDER_PAYMENT_PRICE" NUMBER(10,0), 
-	"ORDER_DEPOSIT_POINT" NUMBER(10,0), 
-	"ORDER_TOTAL_QUANTITY" NUMBER(3,0), 
-	"ORDER_CREATED_DATE" DATE DEFAULT SYSDATE, 
-	"ORDER_UPDATED_DATE" DATE DEFAULT SYSDATE, 
-	"USER_ID" NUMBER(10,0) constraint orders_user_id_fk references users (user_id)
-   ) ;
+CREATE TABLE "ORDERS" (
+"ORDER_ID" NUMBER(10,0) constraint orders_id_pk primary key, 
+"ORDER_STATUS" VARCHAR2(100) DEFAULT '주문완료', 
+"ORDER_TITLE" VARCHAR2(255) not null, 
+"ORDER_TOTAL_PRICE" NUMBER(10,0), 
+"ORDER_USED_POINT" NUMBER(10,0), 
+"ORDER_PAYMENT_PRICE" NUMBER(10,0), 
+"ORDER_DEPOSIT_POINT" NUMBER(10,0), 
+"ORDER_TOTAL_QUANTITY" NUMBER(3,0), 
+"ORDER_CREATED_DATE" DATE DEFAULT SYSDATE, 
+"ORDER_UPDATED_DATE" DATE DEFAULT SYSDATE, 
+"USER_ID" NUMBER(10,0) constraint orders_user_id_fk references users (user_id)
+);
 
-  CREATE TABLE "ORDER_ITEMS" 
-   (	"ORDER_ITEM_ID" NUMBER(10,0) constraint orderitems_id_pk primary key, 
-	"ORDER_ITEM_PRICE" NUMBER(10,0), 
-	"ORDER_ITEM_QUANTITY" NUMBER(3,0), 
-	"ORDER_ITEM_CREATED_DATE" DATE DEFAULT SYSDATE, 
-	"ORDER_ITEM_UPDATED_DATE" DATE DEFAULT SYSDATE, 
-	"BOOK_ID" NUMBER(10,0) constraint orderitems_book_id_fk references books (book_id), 
-	"ORDER_ID" NUMBER(10,0) constraint orderitems_user_id_fk references users (user_id)
-   ) ;
+CREATE TABLE "ORDER_ITEMS" (
+"ORDER_ITEM_ID" NUMBER(10,0) constraint orderitems_id_pk primary key, 
+"ORDER_ITEM_PRICE" NUMBER(10,0), 
+"ORDER_ITEM_QUANTITY" NUMBER(3,0), 
+"ORDER_ITEM_CREATED_DATE" DATE DEFAULT SYSDATE, 
+"ORDER_ITEM_UPDATED_DATE" DATE DEFAULT SYSDATE, 
+"BOOK_ID" NUMBER(10,0) constraint orderitems_book_id_fk references books (book_id), 
+"ORDER_ID" NUMBER(10,0) constraint orderitems_order_id_fk references orders (order_id)
+) ;
 
-  CREATE TABLE "REVIEWS" 
-   (	"REVIEW_ID" NUMBER(10,0) constraint reviews_id_pk primary key, 
-	"REVIEW_CONTENT" VARCHAR2(1000), 
-	"REVIEW_SCORE" NUMBER(1,0), 
-	"REVIEW_CREATED_DATE" DATE DEFAULT SYSDATE, 
-	"REVIEW_UPDATED_DATE" DATE DEFAULT SYSDATE, 
-	"BOOK_ID" NUMBER(10,0) constraint reviews_book_id_fk references books (book_id), 
-	"ORDER_ID" NUMBER(10,0) constraint reviews_user_id_fk references users (user_id)
-   ) ;
+CREATE TABLE "REVIEWS" (
+"REVIEW_ID" NUMBER(10,0) constraint reviews_id_pk primary key, 
+"REVIEW_CONTENT" VARCHAR2(1000), 
+"REVIEW_SCORE" NUMBER(1,0), 
+"REVIEW_CREATED_DATE" DATE DEFAULT SYSDATE, 
+"REVIEW_UPDATED_DATE" DATE DEFAULT SYSDATE, 
+"BOOK_ID" NUMBER(10,0) constraint reviews_book_id_fk references books (book_id), 
+"USER_ID" NUMBER(10,0) constraint reviews_user_id_fk references users (user_id)
+) ;
 
-  CREATE TABLE "USER_POINT_HISTORIES" 
-   (	"POINT_ID" NUMBER(10,0) constraint pointhistories_id_pk primary key, 
-	"POINT_REASON" VARCHAR2(255), 
-	"POINT_AMOUNT" NUMBER(10,0), 
-	"POINT_CREATED_DATE" DATE DEFAULT SYSDATE, 
-	"POINT_UPDATED_DATE" DATE DEFAULT SYSDATE, 
-	"USER_ID" NUMBER(10,0) constraint pointhistories_user_id_fk references users (user_id),
-	"ORDER_ID" NUMBER(10,0) constraint pointhistories_order_id_fk references orders (order_id)
-   ) ;
+CREATE TABLE "USER_POINT_HISTORIES" (
+"POINT_ID" NUMBER(10,0) constraint pointhistories_id_pk primary key, 
+"POINT_REASON" VARCHAR2(255), 
+"POINT_AMOUNT" NUMBER(10,0), 
+"POINT_CREATED_DATE" DATE DEFAULT SYSDATE, 
+"POINT_UPDATED_DATE" DATE DEFAULT SYSDATE, 
+"USER_ID" NUMBER(10,0) constraint pointhistories_user_id_fk references users (user_id),
+"ORDER_ID" NUMBER(10,0) constraint pointhistories_order_id_fk references orders (order_id)
+) ;
